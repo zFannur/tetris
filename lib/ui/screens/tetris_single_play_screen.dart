@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tetris/app_const.dart';
 import 'package:tetris/domain/entities/cell.dart';
+import 'package:tetris/ui/bloc/audio_cubit.dart';
 import 'package:tetris/ui/bloc/score_cubit.dart';
 import 'package:tetris/ui/bloc/tetris_bloc.dart';
 import 'package:tetris/ui/widgets/custom_button.dart';
 import 'package:tetris/ui/widgets/custom_elevation_button.dart';
+import 'package:tetris/ui/widgets/next_tetromino_display.dart';
 
 class TetrisSinglePlayScreen extends StatelessWidget {
   const TetrisSinglePlayScreen({super.key});
@@ -29,8 +31,11 @@ class TetrisSinglePlayScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: BlocListener<ScoreCubit, int>(
                   listener: (context, score) {
-                    int level = 1 + score ~/ 1000;  // Вычисляем уровень на основе текущего счёта
-                    context.read<TetrisBloc>().updateDifficulty(level);
+                    final level = context.read<TetrisBloc>().difficultyLevel;
+
+                    if (level != (1 + score ~/ 1000)) {
+                      context.read<TetrisBloc>().updateDifficulty(level + 1);
+                    }
                   },
                   child: BlocConsumer<TetrisBloc, TetrisState>(
                     listener: (context, state) async {
@@ -165,7 +170,6 @@ class TetrisSinglePlayScreen extends StatelessWidget {
 
   Widget _buildScorePanel(BuildContext context) {
     final theme = Theme.of(context);
-    final level = context.read<ScoreCubit>().currentLevel;
 
     return Padding(
       padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
@@ -189,16 +193,17 @@ class TetrisSinglePlayScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text("Score: $score"),
-                      Text("Level: $level"),
+                      Text("Level: ${(1 + score ~/ 1000).toString()}"),
                     ],
                   ),
                 ),
               );
             },
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
           CustomButton(
             onPressed: () {
+              context.read<AudioCubit>().pause();
               context.read<TetrisBloc>().add(TetrisEvent.pause);
               _handleGamePause(context);
             },
@@ -208,6 +213,8 @@ class TetrisSinglePlayScreen extends StatelessWidget {
               color: Colors.white,
             ),
           ),
+          const SizedBox(width: 8),
+          const Expanded(child: NextTetrominoDisplay()),
         ],
       ),
     );
@@ -230,6 +237,7 @@ class TetrisSinglePlayScreen extends StatelessWidget {
                 CustomElevatedButton(
                   text: "Play",
                   onPressed: () {
+                    context.read<AudioCubit>().play();
                     context.read<TetrisBloc>().add(TetrisEvent.resume);
                     Navigator.maybePop(context);
                   },
@@ -249,6 +257,7 @@ class TetrisSinglePlayScreen extends StatelessWidget {
                 CustomElevatedButton(
                   text: "Menu",
                   onPressed: () {
+                    context.read<AudioCubit>().stop();
                     _handleGameExit(context);
                   },
                 ),
@@ -276,6 +285,7 @@ class TetrisSinglePlayScreen extends StatelessWidget {
             CustomElevatedButton(
               text: "Exit",
               onPressed: () {
+                context.read<AudioCubit>().stop();
                 _handleGameExit(context);
               },
             ),

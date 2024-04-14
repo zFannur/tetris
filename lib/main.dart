@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tetris/ui/bloc/audio_cubit.dart';
 import 'package:tetris/ui/bloc/score_cubit.dart';
 import 'package:tetris/ui/screens/main_menu_screen.dart';
 import 'package:tetris/ui/screens/tetris_single_play_screen.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => TetrisBloc()),
         BlocProvider(create: (_) => ScoreCubit()),
+        BlocProvider(create: (_) => AudioCubit()),
       ],
       child: MaterialApp(
         title: 'Flutter Tetris',

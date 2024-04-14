@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tetris/app_const.dart';
 import 'package:tetris/domain/services/platform_services.dart';
+import 'package:tetris/ui/bloc/audio_cubit.dart';
 import 'package:tetris/ui/bloc/score_cubit.dart';
 import 'package:tetris/ui/bloc/tetris_bloc.dart';
 import 'package:tetris/ui/widgets/custom_elevation_button.dart';
@@ -52,6 +53,7 @@ class MainMenuScreen extends StatelessWidget {
                         final scoreCubit = context.read<ScoreCubit>();
                         final tetrisBloc = context.read<TetrisBloc>();
                         final navigator = Navigator.of(context);
+                        context.read<AudioCubit>().play();
                         await scoreCubit
                             .resetScore(); // Сброс счёта при начале игры
                         tetrisBloc.add(TetrisEvent.restart);
