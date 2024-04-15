@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tetris/app_const.dart';
 import 'package:tetris/domain/services/platform_services.dart';
 import 'package:tetris/ui/bloc/audio_cubit.dart';
+import 'package:tetris/ui/bloc/background_image_cubit.dart';
 import 'package:tetris/ui/bloc/score_cubit.dart';
 import 'package:tetris/ui/bloc/tetris_bloc.dart';
 import 'package:tetris/ui/widgets/custom_elevation_button.dart';
@@ -53,7 +54,6 @@ class MainMenuScreen extends StatelessWidget {
                         final scoreCubit = context.read<ScoreCubit>();
                         final tetrisBloc = context.read<TetrisBloc>();
                         final navigator = Navigator.of(context);
-                        context.read<AudioCubit>().play();
                         await scoreCubit
                             .resetScore(); // Сброс счёта при начале игры
                         tetrisBloc.add(TetrisEvent.restart);
@@ -69,6 +69,10 @@ class MainMenuScreen extends StatelessWidget {
                       },
                     ),
                     CustomElevatedButton(
+                      text: "Settings",
+                      onPressed: () => _showSettingsDialog(context),
+                    ),
+                    CustomElevatedButton(
                       text: "Exit",
                       onPressed: () => _handleAppExit(context),
                     ),
@@ -79,6 +83,95 @@ class MainMenuScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final theme = Theme.of(context);
+
+        return AlertDialog(
+          title: const Text("Settings"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(
+                  "Music",
+                  style: theme.textTheme.titleSmall,
+                ),
+                trailing: BlocBuilder<AudioCubit, bool>(
+                  builder: (context, isPlaying) {
+                    return Switch(
+                      value: isPlaying,
+                      onChanged: (bool value) {
+                        context.read<AudioCubit>().toggleMusicPlayback();
+                      },
+                    );
+                  },
+                ),
+              ),
+              ListTile(
+                title: Text("Image", style: theme.textTheme.titleSmall),
+                onTap: () {
+                  _showBackgroundImageDialog(context);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text('Close', style: theme.textTheme.titleMedium),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showBackgroundImageDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final theme = Theme.of(context);
+
+          return AlertDialog(
+            title: Text('Choose Background Image', style: theme.textTheme.titleMedium),
+            content: SizedBox(
+              // Установка максимального размера контента в диалоговом окне
+                width: double.maxFinite,
+                child: GridView.builder(
+                    shrinkWrap: true, // Убедитесь, что GridView занимает только необходимое пространство
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, // Три элемента в ширину
+                      crossAxisSpacing: 8, // Промежуток между элементами по оси X
+                      mainAxisSpacing: 8, // Промежуток между элементами по оси Y
+                    ),
+                    itemCount: BackgroundImage.values.length,
+                    itemBuilder: (context, index) {
+                      final image = BackgroundImage.values[index];
+                      final String imagePath = context.read<BackgroundImageCubit>().getImagePath(image);
+
+                      return GestureDetector(
+                        onTap: () {
+                          context.read<BackgroundImageCubit>().changeBackground(image);
+                          Navigator.of(context).pop(); // Закрыть диалог после выбора
+                        },
+                        child: Image.asset(
+                            imagePath,
+                            fit: BoxFit.cover // Покрытие всей доступной области
+                        ),
+                      );
+                    }
+                )
+            ),
+          );
+        }
     );
   }
 

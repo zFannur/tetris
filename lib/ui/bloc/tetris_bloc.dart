@@ -27,16 +27,16 @@ class TetrisState {
 
   TetrisState(this.board,
       {Tetromino? currentTetromino,
-      Tetromino? nextTetromino,
-      this.linesCleared = 0,
-      this.isGameOver = false})
+        Tetromino? nextTetromino,
+        this.linesCleared = 0,
+        this.isGameOver = false})
       : currentTetromino = currentTetromino ?? Tetromino.random(),
         nextTetromino = nextTetromino ?? Tetromino.random();
 }
 
 class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
   List<List<Cell>> board = List.generate(AppConst.gridHeight,
-      (_) => List.generate(AppConst.gridWidth, (_) => Cell()));
+          (_) => List.generate(AppConst.gridWidth, (_) => Cell()));
   late Tetromino currentTetromino;
   late Tetromino nextTetromino;
   Color currentColor = Colors.blue;
@@ -45,13 +45,13 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
 
   TetrisBloc()
       : super(
-          TetrisState(
-            List.generate(
-              AppConst.gridHeight,
-              (_) => List.generate(AppConst.gridWidth, (_) => Cell()),
-            ),
-          ),
-        ) {
+    TetrisState(
+      List.generate(
+        AppConst.gridHeight,
+            (_) => List.generate(AppConst.gridWidth, (_) => Cell()),
+      ),
+    ),
+  ) {
     on<TetrisEvent>((event, emit) {
       switch (event) {
         case TetrisEvent.moveLeft:
@@ -100,7 +100,7 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
     int speedAdjustment =
         difficultyLevel * 100; // Ускорение на каждом уровне сложности
     Duration interval =
-        Duration(milliseconds: baseSpeed.inMilliseconds - speedAdjustment);
+    Duration(milliseconds: baseSpeed.inMilliseconds - speedAdjustment);
 
     _timer?.cancel(); // Отменяем предыдущий таймер, если он был
     _timer = Timer.periodic(interval, (timer) {
@@ -112,7 +112,7 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
     currentTetromino = _generateNewTetromino(); // Генерация текущего тетромино
     nextTetromino = _generateNewTetromino(); // Генерация следующего тетромино
     board = List.generate(AppConst.gridHeight,
-        (_) => List.generate(AppConst.gridWidth, (_) => Cell()));
+            (_) => List.generate(AppConst.gridWidth, (_) => Cell()));
     _setupTimer(); // Настройка таймера с учетом сложности
     emit(TetrisState(
       board,
@@ -128,14 +128,18 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
   }
 
   void _move(int dx, int dy, Emitter<TetrisState> emit) {
-    clearTetrominoFromBoard(currentTetromino);  // Очищаем текущую позицию фигуры на доске
-    currentTetromino.move(dx, dy);  // Перемещаем фигуру
+    clearTetrominoFromBoard(
+        currentTetromino); // Очищаем текущую позицию фигуры на доске
+    currentTetromino.move(dx, dy); // Перемещаем фигуру
 
     if (_checkCollision(currentTetromino)) {
-      currentTetromino.move(-dx, -dy);  // Если после перемещения возникло столкновение, возвращаем фигуру на исходную позицию
-      placeTetrominoOnBoard(currentTetromino);  // Помещаем фигуру обратно на доску
+      currentTetromino.move(-dx,
+          -dy); // Если после перемещения возникло столкновение, возвращаем фигуру на исходную позицию
+      placeTetrominoOnBoard(
+          currentTetromino); // Помещаем фигуру обратно на доску
     } else {
-      placeTetrominoOnBoard(currentTetromino);  // Если столкновения нет, оставляем фигуру на новом месте
+      placeTetrominoOnBoard(
+          currentTetromino); // Если столкновения нет, оставляем фигуру на новом месте
     }
 
     // Отправляем обновленное состояние игры, включая информацию о доске, текущей и следующей фигуре
@@ -176,41 +180,99 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
     }
   }
 
+  // void _rotate(Emitter<TetrisState> emit) {
+  //   if (currentTetromino.type == TetrominoType.O) return; // Кубик не вращаем.
+  //
+  //   clearTetrominoFromBoard(currentTetromino);
+  //   currentTetromino.rotate(); // Вращаем тетромино.
+  //
+  //   int shiftX = 0; // Определяем переменную для отслеживания сдвига
+  //
+  //   // Пробуем подвинуть тетромино в пределы поля.
+  //   while (currentTetromino.position.x < 0) {
+  //     shiftX++;
+  //     currentTetromino.move(1, 0); // Сдвигаем вправо.
+  //   }
+  //   while (currentTetromino.position.x + currentTetromino.width > AppConst.gridWidth) {
+  //     shiftX--;
+  //     currentTetromino.move(-1, 0); // Сдвигаем влево.
+  //   }
+  //
+  //   // Проверяем столкновения после вращения и сдвига.
+  //   if (_checkCollision(currentTetromino)) {
+  //     // Если есть столкновение, отменяем вращение и сдвиг.
+  //     for (int i = 0; i < 3; i++) {
+  //       currentTetromino.rotate(); // Возвращаем тетромино в исходное положение.
+  //     }
+  //     currentTetromino.move(-shiftX, 0); // Возвращаем в исходное положение по горизонтали.
+  //   }
+  //
+  //   placeTetrominoOnBoard(currentTetromino); // Помещаем тетромино обратно на доску.
+  //   emit(TetrisState(
+  //       List<List<Cell>>.from(board),
+  //       currentTetromino: currentTetromino,
+  //       nextTetromino: nextTetromino, // Обновляем состояние с учетом следующей фигуры
+  //       linesCleared: 0,
+  //       isGameOver: false
+  //   ));
+  // }
+
   void _rotate(Emitter<TetrisState> emit) {
     if (currentTetromino.type == TetrominoType.O) return; // Кубик не вращаем.
 
     clearTetrominoFromBoard(currentTetromino);
-    currentTetromino.rotate(); // Вращаем тетромино.
+    currentTetromino.rotate(); // Попытка вращения тетромино.
 
-    int shiftX = 0; // Определяем переменную для отслеживания сдвига
+    // Получаем возможные смещения для проверки возможности размещения после вращения
+    List<Point<int>> kickOffsets = _getWallKickOffsets(currentTetromino.type);
+    bool placed = false;
 
-    // Пробуем подвинуть тетромино в пределы поля.
-    while (currentTetromino.position.x < 0) {
-      shiftX++;
-      currentTetromino.move(1, 0); // Сдвигаем вправо.
-    }
-    while (currentTetromino.position.x + currentTetromino.width > AppConst.gridWidth) {
-      shiftX--;
-      currentTetromino.move(-1, 0); // Сдвигаем влево.
-    }
+    for (var offset in kickOffsets) {
+      currentTetromino.move(offset.x, offset.y); // Пробуем сдвигать тетромино
 
-    // Проверяем столкновения после вращения и сдвига.
-    if (_checkCollision(currentTetromino)) {
-      // Если есть столкновение, отменяем вращение и сдвиг.
-      for (int i = 0; i < 3; i++) {
-        currentTetromino.rotate(); // Возвращаем тетромино в исходное положение.
+      if (!_checkCollision(currentTetromino)) {
+        placed = true;
+        break; // Успешное размещение
       }
-      currentTetromino.move(-shiftX, 0); // Возвращаем в исходное положение по горизонтали.
+
+      // Возвращаем на исходное положение для следующего смещения
+      currentTetromino.move(-offset.x, -offset.y);
     }
 
-    placeTetrominoOnBoard(currentTetromino); // Помещаем тетромино обратно на доску.
+    if (!placed) {
+      currentTetromino.rotate(); // Вращение обратно, если вращение невозможно
+      currentTetromino.rotate();
+      currentTetromino.rotate(); // Обратно на 270° градусов (3 вращения)
+    }
+
+    placeTetrominoOnBoard(currentTetromino);
     emit(TetrisState(
         List<List<Cell>>.from(board),
         currentTetromino: currentTetromino,
-        nextTetromino: nextTetromino, // Обновляем состояние с учетом следующей фигуры
+        nextTetromino: nextTetromino,
         linesCleared: 0,
         isGameOver: false
     ));
+  }
+
+  List<Point<int>> _getWallKickOffsets(TetrominoType type) {
+    // Здесь примеры смещений могут быть адаптированы
+    if (type == TetrominoType.I) {
+      return [
+        const Point(0, 0),
+        const Point(1, 0),
+        const Point(-2, 0),
+        const Point(-1, 0),
+        const Point(2, 0),
+      ];
+    } else {
+      return [
+        const Point(0, 0),
+        const Point(1, 0),
+        const Point(-1, 0),
+        const Point(0, -1)
+      ]; // Стандартные смещения для других фигур
+    }
   }
 
   void _drop(Emitter<TetrisState> emit) {
@@ -257,38 +319,47 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
   void _hardDrop(Emitter<TetrisState> emit) {
     bool collisionDetected = false;
     int linesCleared = 0;
-    clearTetrominoFromBoard(currentTetromino);  // Очистить текущие позиции перед перемещением
+    clearTetrominoFromBoard(
+        currentTetromino); // Очистить текущие позиции перед перемещением
 
     while (true) {
-      currentTetromino.move(0, 1);  // Перемещаем фигуру вниз
+      currentTetromino.move(0, 1); // Перемещаем фигуру вниз
       if (_checkCollision(currentTetromino)) {
-        currentTetromino.move(0, -1);  // Возвращаем фигуру на шаг назад при столкновении
+        currentTetromino.move(
+            0, -1); // Возвращаем фигуру на шаг назад при столкновении
         collisionDetected = true;
         break;
       }
     }
 
-    placeTetrominoOnBoard(currentTetromino);  // Закрепляем фигуру после завершения перемещения
+    placeTetrominoOnBoard(
+        currentTetromino); // Закрепляем фигуру после завершения перемещения
 
     if (collisionDetected) {
-      linesCleared = _clearLines();  // Очищаем полные линии
+      linesCleared = _clearLines(); // Очищаем полные линии
       // Сохраняем следующую фигуру перед генерацией новой, чтобы отобразить её в UI
       Tetromino previousNextTetromino = nextTetromino;
-      currentTetromino = previousNextTetromino;  // Следующая фигура становится текущей
-      nextTetromino = _generateNewTetromino();  // Генерация новой следующей фигуры
+      currentTetromino =
+          previousNextTetromino; // Следующая фигура становится текущей
+      nextTetromino =
+          _generateNewTetromino(); // Генерация новой следующей фигуры
 
       if (_checkCollision(currentTetromino)) {
-        _handleGameOver();  // Обрабатываем конец игры, если новая фигура не помещается
-        emit(TetrisState(board, currentTetromino: currentTetromino, nextTetromino: nextTetromino,
-            linesCleared: linesCleared, isGameOver: true));  // Состояние конца игры
+        _handleGameOver(); // Обрабатываем конец игры, если новая фигура не помещается
+        emit(TetrisState(board, currentTetromino: currentTetromino,
+            nextTetromino: nextTetromino,
+            linesCleared: linesCleared,
+            isGameOver: true)); // Состояние конца игры
       } else {
-        emit(TetrisState(board, currentTetromino: currentTetromino, nextTetromino: nextTetromino,
-            linesCleared: linesCleared, isGameOver: false));  // Обычное состояние игры
+        emit(TetrisState(board, currentTetromino: currentTetromino,
+            nextTetromino: nextTetromino,
+            linesCleared: linesCleared,
+            isGameOver: false)); // Обычное состояние игры
       }
     }
     //else {
-      // emit(TetrisState(board, currentTetromino: currentTetromino, nextTetromino: nextTetromino,
-      //     linesCleared: linesCleared, isGameOver: false));  // Обычное состояние игры
+    // emit(TetrisState(board, currentTetromino: currentTetromino, nextTetromino: nextTetromino,
+    //     linesCleared: linesCleared, isGameOver: false));  // Обычное состояние игры
     //}
   }
 
@@ -299,7 +370,7 @@ class TetrisBloc extends Bloc<TetrisEvent, TetrisState> {
   Tetromino _generateNewTetromino() {
     var types = TetrominoType.values;
     return Tetromino(types[Random().nextInt(types.length)], const Point(5, 0),
-        Colors.accents[Random().nextInt(Colors.accents.length)]);
+        AppConst.colors[Random().nextInt(AppConst.colors.length)]);
   }
 
   bool _checkCollision(Tetromino tetromino) {
@@ -427,6 +498,11 @@ class Tetromino {
   void rotate() {
     // Простая ротация на 90 градусов по часовой стрелке
     shape = shape.map((p) => Point(-p.y, p.x)).toList();
+  }
+
+  void reverseRotate() {
+    // Обратная ротация на 90 градусов (по часовой стрелке)
+    shape = shape.map((p) => Point(p.y, -p.x)).toList();
   }
 
   int get width {

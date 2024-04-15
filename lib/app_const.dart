@@ -5,6 +5,16 @@ class AppConst {
 
   static const gridHeight = 14;
   static const gridWidth = 10;
+
+  static const colors = [
+    Color(0xFF0000FF),
+    Color(0xFFFF0000),
+    Color(0xFF00FF00),
+    Color(0xFFFFFF00),
+    Color(0xFFFFA500),
+    Color(0xFF800080),
+    Color(0xFF00FFFF),
+  ];
 }
 
 class AppRoutes {

@@ -1,67 +1,57 @@
 import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Кубит для управления состоянием аудио плеера
-class AudioCubit extends Cubit<AudioPlayerState> {
+class AudioCubit extends Cubit<bool> with WidgetsBindingObserver {
   late AudioPlayer _audioPlayer;
-  StreamSubscription? _playerSubscription;
+  late SharedPreferences _prefs;
 
-  AudioCubit() : super(AudioPlayerState.initial) {
-    _audioPlayer = AudioPlayer();
+  AudioCubit() : super(true) {
     _init();
   }
 
-  void _init() {
+  Future<void> _init() async {
+    _audioPlayer = AudioPlayer();
+    _prefs = await SharedPreferences.getInstance();
+    WidgetsBinding.instance.addObserver(this); // Добавляем observer для жизненного цикла
+
+    bool shouldPlayMusic = _prefs.getBool('shouldPlayMusic') ?? true;
+    emit(shouldPlayMusic); // Устанавливаем начальное состояние воспроизведения
+
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    if (shouldPlayMusic) {
       await _audioPlayer.setSource(AssetSource('audio/background_music.mp3'));
       await _audioPlayer.resume();
-    });
-
-    _playerSubscription = _audioPlayer.onPlayerStateChanged.listen((state) {
-      switch (state) {
-        case PlayerState.playing:
-          emit(AudioPlayerState.playing);
-          break;
-        case PlayerState.paused:
-          emit(AudioPlayerState.paused);
-          break;
-        case PlayerState.stopped:
-          emit(AudioPlayerState.stopped);
-          break;
-        case PlayerState.completed:
-          emit(AudioPlayerState.completed);
-          break;
-        default:
-          emit(AudioPlayerState.stopped);
-          break;
-      }
-    });
+    }
   }
 
-  Future<void> play() async {
-    await _audioPlayer.resume();
+  Future<void> toggleMusicPlayback() async {
+    bool currentSetting = state;
+    if (currentSetting) {
+      await _audioPlayer.pause();
+    } else {
+      await _audioPlayer.resume();
+    }
+    await _prefs.setBool('shouldPlayMusic', !currentSetting);
+    emit(!currentSetting);
   }
 
-  Future<void> pause() async {
-    await _audioPlayer.pause();
-  }
-
-  Future<void> stop() async {
-    await _audioPlayer.stop();
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _audioPlayer.pause();
+    } else if (state == AppLifecycleState.resumed && this.state) {
+      _audioPlayer.resume();
+    }
   }
 
   @override
   Future<void> close() {
-    _playerSubscription?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     _audioPlayer.dispose();
     return super.close();
   }
 }
-
-// Enum для состояния аудио плеера
-enum AudioPlayerState { initial, playing, paused, stopped, completed }
