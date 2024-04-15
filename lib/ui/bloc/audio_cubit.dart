@@ -21,10 +21,14 @@ class AudioCubit extends Cubit<bool> with WidgetsBindingObserver {
     emit(shouldPlayMusic); // Устанавливаем начальное состояние воспроизведения
 
     _audioPlayer.setReleaseMode(ReleaseMode.loop);
+    print("Is playing from prefs: $shouldPlayMusic");
 
     if (shouldPlayMusic) {
       await _audioPlayer.setSource(AssetSource('audio/background_music.mp3'));
       await _audioPlayer.resume();
+    } else {
+      await _audioPlayer.setSource(AssetSource('audio/background_music.mp3'));
+      await _audioPlayer.pause();
     }
   }
 

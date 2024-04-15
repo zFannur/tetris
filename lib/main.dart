@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => TetrisBloc()),
         BlocProvider(create: (_) => ScoreCubit()),
-        BlocProvider(create: (_) => AudioCubit()),
+        BlocProvider(create: (_) => AudioCubit(), lazy: false),
         BlocProvider(create: (_) => BackgroundImageCubit()),
       ],
       child: MaterialApp(
@@ -58,9 +58,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.main: (context) => const MainMenuScreen(),
           AppRoutes.tetris: (context) => const TetrisSinglePlayScreen(),
         },
-        home: BlocBuilder<AudioCubit, bool>(
-          builder: (BuildContext context, state) => const MainMenuScreen(),
-        ),
+        home: const MainMenuScreen(),
       ),
     );
   }
