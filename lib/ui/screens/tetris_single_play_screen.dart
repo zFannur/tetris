@@ -69,6 +69,14 @@ class TetrisSinglePlayScreen extends StatelessWidget {
                     color: Colors.white,
                     width: 3,
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      offset: const Offset(0, 2),
+                      blurRadius: 2.0,
+                      spreadRadius: 0.0,
+                    )
+                  ],
                   color: Colors.white.withOpacity(0.6),
                 ),
                 child: DefaultTextStyle(
@@ -156,51 +164,40 @@ class TetrisSinglePlayScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          FloatingActionButton(
-            backgroundColor: Colors.white.withOpacity(0.6),
-            heroTag: 'moveLeft',
-            // Уникальный тег для Hero анимации
-            onPressed: () =>
-                context.read<TetrisBloc>().add(TetrisEvent.moveLeft),
-            tooltip: 'Move Left',
+          CustomButton(
+            onPressed: () {
+              context.read<TetrisBloc>().add(TetrisEvent.moveLeft);
+            },
             child: const Icon(
               Icons.arrow_back_ios_new,
               size: 40,
               color: Colors.white,
             ),
           ),
-          FloatingActionButton(
-            backgroundColor: Colors.white.withOpacity(0.6),
-            heroTag: 'rotate',
-            // Уникальный тег
-            onPressed: () => context.read<TetrisBloc>().add(TetrisEvent.rotate),
-            tooltip: 'Rotate',
+          CustomButton(
+            onPressed: () {
+              context.read<TetrisBloc>().add(TetrisEvent.rotate);
+            },
             child: const Icon(
               Icons.rotate_right,
               size: 40,
               color: Colors.white,
             ),
           ),
-          FloatingActionButton(
-            backgroundColor: Colors.white.withOpacity(0.6),
-            heroTag: 'hardDrop',
-            // Уникальный тег
-            onPressed: () =>
-                context.read<TetrisBloc>().add(TetrisEvent.hardDrop),
-            tooltip: 'Hard Drop',
+          CustomButton(
+            onPressed: () {
+              context.read<TetrisBloc>().add(TetrisEvent.hardDrop);
+            },
             child: const Icon(
               Icons.arrow_downward,
               size: 40,
               color: Colors.white,
             ),
           ),
-          FloatingActionButton(
-            backgroundColor: Colors.white.withOpacity(0.6),
-            heroTag: 'moveRight',
-            // Уникальный тег
-            onPressed: () =>
-                context.read<TetrisBloc>().add(TetrisEvent.moveRight),
-            tooltip: 'Move Right',
+          CustomButton(
+            onPressed: () {
+              context.read<TetrisBloc>().add(TetrisEvent.moveRight);
+            },
             child: const Icon(
               Icons.arrow_forward_ios,
               size: 40,

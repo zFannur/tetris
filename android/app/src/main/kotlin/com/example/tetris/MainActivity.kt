@@ -1,4 +1,4 @@
-package com.example.tetris
+package com.nevolution.tetris
 
 import io.flutter.embedding.android.FlutterActivity
 

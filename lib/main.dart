@@ -37,10 +37,10 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => TetrisBloc()),
         BlocProvider(create: (_) => ScoreCubit()),
         BlocProvider(create: (_) => AudioCubit(), lazy: false),
-        BlocProvider(create: (_) => BackgroundImageCubit()),
+        BlocProvider(create: (_) => BackgroundImageCubit(), lazy: false),
       ],
       child: MaterialApp(
-        title: 'Flutter Tetris',
+        title: 'Simple Tetris',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,

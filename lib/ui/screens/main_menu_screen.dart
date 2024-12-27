@@ -115,6 +115,23 @@ class MainMenuScreen extends StatelessWidget {
               ),
               ListTile(
                 title: Text("Image", style: theme.textTheme.titleSmall),
+                trailing: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  // Закругление углов ClipRRect
+                  child: BlocBuilder<BackgroundImageCubit, BackgroundImage>(
+                    builder: (context, image) {
+                      final String imagePath = context
+                          .read<BackgroundImageCubit>()
+                          .getImagePath(image);
+
+                      return Image.asset(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width / 7,
+                      );
+                    },
+                  ),
+                ),
                 onTap: () {
                   _showBackgroundImageDialog(context);
                 },
@@ -141,38 +158,49 @@ class MainMenuScreen extends StatelessWidget {
           final theme = Theme.of(context);
 
           return AlertDialog(
-            title: Text('Choose Background Image', style: theme.textTheme.titleMedium),
+            title: Text('Choose Background Image',
+                style: theme.textTheme.titleMedium),
             content: SizedBox(
-              // Установка максимального размера контента в диалоговом окне
+                // Установка максимального размера контента в диалоговом окне
                 width: double.maxFinite,
                 child: GridView.builder(
-                    shrinkWrap: true, // Убедитесь, что GridView занимает только необходимое пространство
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3, // Три элемента в ширину
-                      crossAxisSpacing: 8, // Промежуток между элементами по оси X
-                      mainAxisSpacing: 8, // Промежуток между элементами по оси Y
+                    shrinkWrap: true,
+                    // Убедитесь, что GridView занимает только необходимое пространство
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      // Три элемента в ширину
+                      crossAxisSpacing: 8,
+                      // Промежуток между элементами по оси X
+                      mainAxisSpacing:
+                          8, // Промежуток между элементами по оси Y
                     ),
                     itemCount: BackgroundImage.values.length,
                     itemBuilder: (context, index) {
                       final image = BackgroundImage.values[index];
-                      final String imagePath = context.read<BackgroundImageCubit>().getImagePath(image);
+                      final String imagePath = context
+                          .read<BackgroundImageCubit>()
+                          .getImagePath(image);
 
                       return GestureDetector(
                         onTap: () {
-                          context.read<BackgroundImageCubit>().changeBackground(image);
-                          Navigator.of(context).pop(); // Закрыть диалог после выбора
+                          context
+                              .read<BackgroundImageCubit>()
+                              .changeBackground(image);
+                          Navigator.of(context)
+                              .pop(); // Закрыть диалог после выбора
                         },
-                        child: Image.asset(
-                            imagePath,
-                            fit: BoxFit.cover // Покрытие всей доступной области
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(imagePath,
+                              fit: BoxFit
+                                  .cover // Покрытие всей доступной области
+                              ),
                         ),
                       );
-                    }
-                )
-            ),
+                    })),
           );
-        }
-    );
+        });
   }
 
   void _handleAppExit(BuildContext context) {
